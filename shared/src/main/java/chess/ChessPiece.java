@@ -21,11 +21,11 @@ public class ChessPiece {
      * The various different chess piece options
      */
     public enum PieceType {
-        KING,
-        QUEEN,
         BISHOP,
-        KNIGHT,
         ROOK,
+        QUEEN,
+        KING,
+        KNIGHT,
         PAWN
     }
 
@@ -55,6 +55,8 @@ public class ChessPiece {
         
         switch (this.type){
             case BISHOP -> { getBishopMoves(board, startPosition, moves);}
+            case ROOK -> { getRookMoves(board, startPosition, moves);}
+            case QUEEN -> { getQueenMoves(board, startPosition, moves);}
 
         }
         
@@ -64,6 +66,90 @@ public class ChessPiece {
 
     public void getBishopMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
         int[][] directions = {
+                {1, 1},
+                {1, -1},
+                {-1, 1},
+                {-1, -1}
+        };
+
+        for (int[] dir : directions) {
+            int row = startPosition.getRow();
+            int col = startPosition.getColumn();
+
+            while (true) {
+                row += dir[0];
+                col += dir[1];
+
+
+                //Check Boundary
+                if (row < 1 || row > 8 || col < 1 || col > 8) {
+                    break;
+                }
+                ChessPosition targetPosition = new ChessPosition(row, col);
+                ChessPiece pieceAtTarget = board.getPiece(targetPosition);
+
+                //Add open square
+                if (pieceAtTarget == null) {
+                    moves.add(new ChessMove(startPosition, targetPosition, null));
+                }
+
+                //Check for enemy piece to add square
+                else {
+                    if (pieceAtTarget.getTeamColor() != this.pieceColor) {
+                        moves.add(new ChessMove(startPosition, targetPosition, null));
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public void getRookMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
+        int[][] directions = {
+                {1, 0},
+                {-1, 0},
+                {0, 1},
+                {0, -1}
+        };
+
+        for (int[] dir : directions) {
+            int row = startPosition.getRow();
+            int col = startPosition.getColumn();
+
+            while (true) {
+                row += dir[0];
+                col += dir[1];
+
+
+                //Check Boundary
+                if (row < 1 || row > 8 || col < 1 || col > 8) {
+                    break;
+                }
+                ChessPosition targetPosition = new ChessPosition(row, col);
+                ChessPiece pieceAtTarget = board.getPiece(targetPosition);
+
+                //Add open square
+                if (pieceAtTarget == null) {
+                    moves.add(new ChessMove(startPosition, targetPosition, null));
+                }
+
+                //Check for enemy piece to add square
+                else {
+                    if (pieceAtTarget.getTeamColor() != this.pieceColor) {
+                        moves.add(new ChessMove(startPosition, targetPosition, null));
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public void getQueenMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
+        int[][] directions = {
+                {1, 0},
+                {-1, 0},
+                {0, 1},
+                {0, -1},
                 {1, 1},
                 {1, -1},
                 {-1, 1},
