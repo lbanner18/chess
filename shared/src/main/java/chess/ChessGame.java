@@ -1,6 +1,7 @@
 package chess;
 import chess.ChessPiece;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -53,9 +54,28 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece != null && piece.getTeamColor() == teamTurn) {
-            piece.
+        if (piece == null) {
+            return null;
         }
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        for (ChessMove move : possibleMoves) {
+
+            // Simulate move
+            ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+            board.addPiece(move.getEndPosition(), piece);
+            board.addPiece(move.getStartPosition(), null);
+
+            // Check for checks (check check)
+            if (!isInCheck(piece.getTeamColor())) {
+                validMoves.add(move);
+            }
+
+            // Revert board
+            board.addPiece(move.getStartPosition(), piece);
+            board.addPiece(move.getEndPosition(), capturedPiece);
+            }
+        return validMoves;
     }
 
     /**
