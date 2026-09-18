@@ -57,7 +57,9 @@ public class ChessPiece {
             case BISHOP -> { getBishopMoves(board, startPosition, moves);}
             case ROOK -> { getRookMoves(board, startPosition, moves);}
             case QUEEN -> { getQueenMoves(board, startPosition, moves);}
-
+            case KING -> { getKingMoves(board, startPosition, moves);}
+            case KNIGHT -> { getKnightMoves(board, startPosition, moves);}
+            case PAWN -> { getPawnMoves(board, startPosition, moves);}
         }
         
         return moves;
@@ -66,10 +68,10 @@ public class ChessPiece {
 
     public void getBishopMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
         int[][] directions = {
-                {1, 1},
-                {1, -1},
-                {-1, 1},
-                {-1, -1}
+            {1, 1},
+            {1, -1},
+            {-1, 1},
+            {-1, -1}
         };
 
         for (int[] dir : directions) {
@@ -106,10 +108,10 @@ public class ChessPiece {
 
     public void getRookMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
         int[][] directions = {
-                {1, 0},
-                {-1, 0},
-                {0, 1},
-                {0, -1}
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1}
         };
 
         for (int[] dir : directions) {
@@ -146,14 +148,14 @@ public class ChessPiece {
 
     public void getQueenMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
         int[][] directions = {
-                {1, 0},
-                {-1, 0},
-                {0, 1},
-                {0, -1},
-                {1, 1},
-                {1, -1},
-                {-1, 1},
-                {-1, -1}
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1},
+            {1, 1},
+            {1, -1},
+            {-1, 1},
+            {-1, -1}
         };
 
         for (int[] dir : directions) {
@@ -187,6 +189,196 @@ public class ChessPiece {
             }
         }
     }
+
+    public void getKingMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
+        int[][] directions = {
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1},
+            {1, 1},
+            {1, -1},
+            {-1, 1},
+            {-1, -1}
+        };
+
+        for (int[] dir : directions) {
+            int row = startPosition.getRow();
+            int col = startPosition.getColumn();
+
+
+            row += dir[0];
+            col += dir[1];
+
+
+            //Check Boundary
+            if (row > 0 && row < 9 && col > 0 && col < 9) {
+                ChessPosition targetPosition = new ChessPosition(row, col);
+                ChessPiece pieceAtTarget = board.getPiece(targetPosition);
+
+                //Add open square
+                if (pieceAtTarget == null) {
+                    moves.add(new ChessMove(startPosition, targetPosition, null));
+                }
+
+                //Check for enemy piece to add square
+                else {
+                    if (pieceAtTarget.getTeamColor() != this.pieceColor) {
+                        moves.add(new ChessMove(startPosition, targetPosition, null));
+                    }
+                }
+            }
+        }
+    }
+
+    public void getKnightMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
+        int[][] directions = {
+            {2, 1},
+            {2, -1},
+            {-2, 1},
+            {-2, -1},
+            {1, 2},
+            {1, -2},
+            {-1, 2},
+            {-1, -2}
+        };
+
+        for (int[] dir : directions) {
+            int row = startPosition.getRow();
+            int col = startPosition.getColumn();
+
+            row += dir[0];
+            col += dir[1];
+
+            //Check Boundary
+            if (row > 0 && row < 9 && col > 0 && col < 9) {
+                ChessPosition targetPosition = new ChessPosition(row, col);
+                ChessPiece pieceAtTarget = board.getPiece(targetPosition);
+
+                //Add open square
+                if (pieceAtTarget == null) {
+                    moves.add(new ChessMove(startPosition, targetPosition, null));
+                }
+
+                //Check for enemy piece to add square
+                else {
+                    if (pieceAtTarget.getTeamColor() != this.pieceColor) {
+                        moves.add(new ChessMove(startPosition, targetPosition, null));
+                    }
+                }
+            }
+        }
+    }
+
+    public void pawnPromotionMoves(ChessBoard board, ChessPosition startPosition, ChessPosition targetPosition, List<ChessMove> moves) {
+        moves.add(new ChessMove(startPosition, targetPosition, PieceType.KNIGHT));
+        moves.add(new ChessMove(startPosition, targetPosition, PieceType.BISHOP));
+        moves.add(new ChessMove(startPosition, targetPosition, PieceType.ROOK));
+        moves.add(new ChessMove(startPosition, targetPosition, PieceType.QUEEN));
+    }
+
+    public void getPawnMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
+        int row = startPosition.getRow();
+        int col = startPosition.getColumn();
+
+        if (this.getTeamColor() == ChessGame.TeamColor.WHITE) {
+
+            //Standard Forward Move
+            ChessPosition targetPosition = new ChessPosition(row + 1, col);
+            ChessPiece targetPiece = board.getPiece(targetPosition);
+            if (targetPiece == null) {
+                if (row == 7) {
+                    pawnPromotionMoves(board, startPosition, targetPosition, moves);
+                }
+                else {
+                    moves.add(new ChessMove(startPosition, targetPosition, null));
+                }
+            }
+
+            //Check for first move exception
+            if (row == 2) {
+                ChessPosition firstMoveTargetPosition = new ChessPosition(row + 2, col);
+                ChessPiece firstMoveTargetPiece = board.getPiece(firstMoveTargetPosition);
+                if (targetPiece == null && firstMoveTargetPiece == null) {
+                    moves.add(new ChessMove(startPosition, firstMoveTargetPosition, null));
+                }
+            }
+
+            //Check for enemy available to capture in the front-left
+            if (col > 1) {
+                ChessPosition enemyLeft = new ChessPosition(row + 1, col - 1);
+                ChessPiece enemyLeftPiece = board.getPiece(enemyLeft);
+                if (enemyLeftPiece != null && enemyLeftPiece.getTeamColor() == ChessGame.TeamColor.BLACK && row < 7) {
+                    moves.add(new ChessMove(startPosition, enemyLeft, null));
+                }
+                if (enemyLeftPiece != null && enemyLeftPiece.getTeamColor() == ChessGame.TeamColor.BLACK && row == 7) {
+                    pawnPromotionMoves(board, startPosition, enemyLeft, moves);
+                }
+            }
+
+            //Check for enemy available to capture in the front-right
+            if (col < 8) {
+                ChessPosition enemyRight = new ChessPosition(row + 1, col + 1);
+                ChessPiece enemyRightPiece = board.getPiece(enemyRight);
+                if (enemyRightPiece != null && enemyRightPiece.getTeamColor() == ChessGame.TeamColor.BLACK && row < 7) {
+                    moves.add(new ChessMove(startPosition, enemyRight, null));
+                }
+                if (enemyRightPiece != null && enemyRightPiece.getTeamColor() == ChessGame.TeamColor.BLACK && row == 7) {
+                    pawnPromotionMoves(board, startPosition, enemyRight, moves);
+                }
+            }
+        }
+
+        else {
+
+            //Standard Forward Move
+            ChessPosition targetPosition = new ChessPosition(row - 1, col);
+            ChessPiece targetPiece = board.getPiece(targetPosition);
+            if (targetPiece == null) {
+                if (row == 2) {
+                    pawnPromotionMoves(board, startPosition, targetPosition, moves);
+                }
+                else {
+                    moves.add(new ChessMove(startPosition, targetPosition, null));
+                }
+            }
+
+            //Check for first move exception
+            if (row == 7) {
+                ChessPosition firstMoveTargetPosition = new ChessPosition(row - 2, col);
+                ChessPiece firstMoveTargetPiece = board.getPiece(firstMoveTargetPosition);
+                if (targetPiece == null && firstMoveTargetPiece == null) {
+                    moves.add(new ChessMove(startPosition, firstMoveTargetPosition, null));
+                }
+            }
+
+            //Check for enemy available to capture in the front-left
+            if (col > 1) {
+                ChessPosition enemyLeft = new ChessPosition(row - 1, col - 1);
+                ChessPiece enemyLeftPiece = board.getPiece(enemyLeft);
+                if (enemyLeftPiece != null && enemyLeftPiece.getTeamColor() == ChessGame.TeamColor.WHITE && row > 2) {
+                    moves.add(new ChessMove(startPosition, enemyLeft, null));
+                }
+                if (enemyLeftPiece != null && enemyLeftPiece.getTeamColor() == ChessGame.TeamColor.WHITE && row == 2) {
+                    pawnPromotionMoves(board, startPosition, enemyLeft, moves);
+                }
+            }
+
+            //Check for enemy available to capture in the front-right
+            if (col < 8) {
+                ChessPosition enemyRight = new ChessPosition(row - 1, col + 1);
+                ChessPiece enemyRightPiece = board.getPiece(enemyRight);
+                if (enemyRightPiece != null && enemyRightPiece.getTeamColor() == ChessGame.TeamColor.WHITE && row > 2) {
+                    moves.add(new ChessMove(startPosition, enemyRight, null));
+                }
+                if (enemyRightPiece != null && enemyRightPiece.getTeamColor() == ChessGame.TeamColor.WHITE && row == 2) {
+                    pawnPromotionMoves(board, startPosition, enemyRight, moves);
+                }
+            }
+        }
+    }
+
+
 
     @Override
     public boolean equals(Object o) {
