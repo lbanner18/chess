@@ -127,6 +127,34 @@ public class ChessGame {
             }
         }
 
+        //check for en passant
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && enPassantTarget != null) {
+            int startRow = startPosition.getRow();
+            int startCol = startPosition.getColumn();
+            int targetRow = enPassantTarget.getRow();
+            int targetCol = enPassantTarget.getColumn();
+
+            boolean isWhiteEligible = (piece.getTeamColor() == TeamColor.WHITE && startRow == 5 && targetRow == 6);
+            boolean isBlackEligible = (piece.getTeamColor() == TeamColor.BLACK && startRow == 4 && targetRow == 3);
+
+            if ((isWhiteEligible || isBlackEligible && (startCol - targetCol == 1 || startCol - targetCol == -1))) {
+                ChessPosition capturedPawn = new ChessPosition(startRow, targetCol);
+                ChessPiece enemyPawn = board.getPiece(capturedPawn);
+
+                board.addPiece(enPassantTarget, piece);
+                board.addPiece(startPosition, null);
+                board.addPiece(capturedPawn, null);
+
+                if (!isInCheck(piece.getTeamColor())){
+                    validMoves.add(new ChessMove(startPosition, enPassantTarget, null));
+                }
+
+                board.addPiece(startPosition, piece);
+                board.addPiece(enPassantTarget, null);
+                board.addPiece(capturedPawn, enemyPawn);
+            }
+        }
+
         return validMoves;
     }
 
