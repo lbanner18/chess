@@ -12,7 +12,7 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    private TeamColor teamTurn = TeamColor.WHITE;
+    private TeamColor teamTurn;
     private ChessBoard board;
 
    public ChessGame() {
@@ -109,7 +109,7 @@ public class ChessGame {
         return null;
     }
 
-    public boolean anyValidMoves(TeamColor teamColor) {
+    public boolean noValidMoves(TeamColor teamColor) {
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
                 ChessPosition pieceSquare = new ChessPosition(row, col);
@@ -118,12 +118,12 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> moves = validMoves(pieceSquare);
                     if (moves != null && !moves.isEmpty()) {
-                        return true;
+                        return false;
                     }
                 }
             }
         }
-        return false;
+        return true;
     }
 
     public boolean isInCheck(TeamColor teamColor) {
@@ -157,7 +157,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return isInCheck(teamColor) && !anyValidMoves(teamColor);
+        return isInCheck(teamColor) && noValidMoves(teamColor);
     }
 
     /**
@@ -168,7 +168,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return !isInCheck(teamColor) && !anyValidMoves(teamColor);
+        return !isInCheck(teamColor) && noValidMoves(teamColor);
     }
 
     /**
