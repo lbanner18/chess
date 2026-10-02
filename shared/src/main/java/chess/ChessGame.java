@@ -1,8 +1,8 @@
 package chess;
-import chess.ChessPiece;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -15,10 +15,19 @@ public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard board;
 
+    private boolean whiteKingMoved = false;
+    private boolean whiteKingsideRookMoved = false;
+    private boolean whiteQueensideRookMoved = false;
+
+    private boolean blackKingMoved = false;
+    private boolean blackKingsideRookMoved = false;
+    private boolean blackQueensideRookMoved = false;
+
    public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
         this.teamTurn = TeamColor.WHITE;
+        resetCastlingRights();
     }
 
     /**
@@ -201,6 +210,21 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+        resetCastlingRights();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(teamTurn, board);
     }
 
     /**
@@ -210,5 +234,15 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.board;
+    }
+
+    private void resetCastlingRights() {
+        whiteKingMoved = false;
+        whiteKingsideRookMoved = false;
+        whiteQueensideRookMoved = false;
+
+        blackKingMoved = false;
+        blackKingsideRookMoved = false;
+        blackQueensideRookMoved = false;
     }
 }
