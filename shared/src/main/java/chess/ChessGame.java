@@ -23,6 +23,8 @@ public class ChessGame {
     private boolean blackKingsideRookMoved = false;
     private boolean blackQueensideRookMoved = false;
 
+    private ChessPosition enPassantTarget = null;
+
    public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
@@ -283,6 +285,7 @@ public class ChessGame {
     public void setBoard(ChessBoard board) {
         this.board = board;
         resetCastlingRights();
+        enPassantTarget = null;
     }
 
     @Override
