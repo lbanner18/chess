@@ -214,6 +214,16 @@ public class ChessGame {
         if (start.equals(new ChessPosition(8, 8)) || end.equals(new ChessPosition(8, 8))) blackKingsideRookMoved = true;
         if (start.equals(new ChessPosition(8, 1)) || end.equals(new ChessPosition(8, 1))) blackQueensideRookMoved = true;
 
+        //Make en passant move
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getEndPosition() == enPassantTarget) {
+            int targetRow = move.getStartPosition().getRow();
+            int targetCol = move.getStartPosition().getColumn();
+            board.addPiece(new ChessPosition(targetRow, targetCol), null);
+
+            //check for En Passant
+
+        }
+
         //Toggle Turn
         setTeamTurn((teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE);
     }
