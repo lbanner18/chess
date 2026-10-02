@@ -87,6 +87,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = board.getPiece(move.getStartPosition());
 
+        //Move legality
         if (piece == null) {
             throw new InvalidMoveException("No piece at position");
         }
@@ -97,6 +98,17 @@ public class ChessGame {
         if (legalMoves == null || !legalMoves.contains(move)) {
             throw new InvalidMoveException("Move is not legal");
         }
+
+        //Promotion pieces
+        if (move.getPromotionPiece() != null) {
+            board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+        } else {
+            board.addPiece(move.getEndPosition(), piece);
+        }
+        board.addPiece(move.getStartPosition(), null);
+
+        //Toggle Turn
+        setTeamTurn((teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE);
     }
 
     /**
