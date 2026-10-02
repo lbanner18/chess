@@ -141,6 +141,28 @@ public class ChessGame {
         return null;
     }
 
+    public boolean squareUnderAttack(ChessPosition position, TeamColor teamColor) {
+        if (position == null) {
+            return false;
+        }
+            for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition enemySquare = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(enemySquare);
+
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    Collection<ChessMove> enemyMoves = piece.pieceMoves(board, enemySquare);
+                    for (ChessMove move : enemyMoves) {
+                        if (move.getEndPosition().equals(position)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+            return false;
+    }
+
     public boolean noValidMoves(TeamColor teamColor) {
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
@@ -160,25 +182,7 @@ public class ChessGame {
 
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingSquare = findKing(teamColor);
-        if (kingSquare == null) {
-            return false;
-        }
-        for (int row = 1; row < 9; row++) {
-            for (int col = 1; col < 9; col++) {
-                ChessPosition enemySquare = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(enemySquare);
-
-                if (piece != null && piece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> enemyMoves = piece.pieceMoves(board, enemySquare);
-                    for (ChessMove move : enemyMoves) {
-                        if (move.getEndPosition().equals(kingSquare)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+        return squareUnderAttack(kingSquare, teamColor);
     }
 
 
