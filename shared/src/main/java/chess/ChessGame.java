@@ -137,7 +137,7 @@ public class ChessGame {
             boolean isWhiteEligible = (piece.getTeamColor() == TeamColor.WHITE && startRow == 5 && targetRow == 6);
             boolean isBlackEligible = (piece.getTeamColor() == TeamColor.BLACK && startRow == 4 && targetRow == 3);
 
-            if ((isWhiteEligible || isBlackEligible && (startCol - targetCol == 1 || startCol - targetCol == -1))) {
+            if ((isWhiteEligible || isBlackEligible) && (startCol - targetCol == 1 || startCol - targetCol == -1)) {
                 ChessPosition capturedPawn = new ChessPosition(startRow, targetCol);
                 ChessPiece enemyPawn = board.getPiece(capturedPawn);
 
@@ -215,13 +215,28 @@ public class ChessGame {
         if (start.equals(new ChessPosition(8, 1)) || end.equals(new ChessPosition(8, 1))) blackQueensideRookMoved = true;
 
         //Make en passant move
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getEndPosition() == enPassantTarget) {
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getEndPosition().equals(enPassantTarget)) {
             int targetRow = move.getStartPosition().getRow();
-            int targetCol = move.getStartPosition().getColumn();
+            int targetCol = move.getEndPosition().getColumn();
             board.addPiece(new ChessPosition(targetRow, targetCol), null);
+        }
 
-            //check for En Passant
+        //check for En Passant
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN ) {
+            int startRow = move.getStartPosition().getRow();
+            int endRow = move.getEndPosition().getRow();
+            int col = move.getStartPosition().getColumn();
 
+            if (startRow == 2 && endRow == 4) {
+                enPassantTarget = new ChessPosition(3, col);
+            } else if (startRow == 7 && endRow == 5) {
+                enPassantTarget = new ChessPosition(6, col);
+            } else {
+                enPassantTarget = null;
+            }
+        }
+        else {
+            enPassantTarget = null;
         }
 
         //Toggle Turn
