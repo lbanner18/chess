@@ -1,4 +1,5 @@
 package dataaccess;
 
-public class UserDAO {
+public interface UserDAO {
+    void clear() throws DataAccessException;
 }
