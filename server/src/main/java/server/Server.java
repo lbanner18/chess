@@ -3,6 +3,8 @@ package server;
 import com.google.gson.Gson;
 import model.RegisterRequest;
 import model.RegisterResult;
+import model.LoginRequest;
+import model.LoginResult;
 import service.UserService;
 import dataaccess.DataAccessException;
 import io.javalin.Javalin;
@@ -37,6 +39,7 @@ public class Server {
             }
         });
 
+        //Register Endpoint
         javalin.post("/user", ctx -> {
             try {
                 RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
@@ -49,6 +52,43 @@ public class Server {
                     ctx.status(400);
                 } else if (e.getMessage().equals("Error: already taken")) {
                     ctx.status(403);
+                } else {
+                    ctx.status(500);
+                }
+                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+            }
+        });
+
+        // Login Endpoint
+        javalin.post("/session", ctx -> {
+            try {
+                LoginRequest request = gson.fromJson(ctx.body(), LoginRequest.class);
+                LoginResult result = userService.login(request);
+
+                ctx.status(200);
+                ctx.result(gson.toJson(result));
+            } catch (DataAccessException e) {
+                if (e.getMessage().equals("Error: unauthorized")) {
+                    ctx.status(401);
+                } else {
+                    ctx.status(500);
+                }
+                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+            }
+        });
+
+        // Logout Endpoint
+        javalin.delete("/session", ctx -> {
+            try {
+                String authToken = ctx.header("authorization");
+
+                userService.logout(authToken);
+
+                ctx.status(200);
+                ctx.result("{}");
+            } catch (DataAccessException e) {
+                if (e.getMessage().equals("Error: unauthorized")) {
+                    ctx.status(401);
                 } else {
                     ctx.status(500);
                 }
