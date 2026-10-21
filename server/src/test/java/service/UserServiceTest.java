@@ -26,7 +26,7 @@ public class UserServiceTest {
 
     @Test
     public void registerSuccess() throws DataAccessException {
-        RegisterRequest request = new RegisterRequest("Luke", "password123", "luke@email.com");
+        RegisterRequest request = new RegisterRequest("Bear", "password123", "luke@email.com");
         RegisterResult result = userService.register(request);
 
         assertEquals("Bear", result.username());
