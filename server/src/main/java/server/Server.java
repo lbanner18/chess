@@ -1,5 +1,10 @@
 package server;
 
+import com.google.gson.Gson;
+import model.RegisterRequest;
+import model.RegisterResult;
+import service.UserService;
+import dataaccess.DataAccessException;
 import io.javalin.Javalin;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
@@ -17,6 +22,9 @@ public class Server {
         MemoryGameDAO gameDAO = new MemoryGameDAO();
 
         ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        UserService userService = new UserService(userDAO, authDAO); // <-- NEW
+
+        Gson gson = new Gson(); // <-- NEW
 
         javalin.delete("/db", ctx -> {
             try {
@@ -26,6 +34,25 @@ public class Server {
             } catch (Exception e) {
                 ctx.status(500);
                 ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
+            }
+        });
+
+        javalin.post("/user", ctx -> {
+            try {
+                RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
+
+                RegisterResult result = userService.register(request);
+                ctx.status(200);
+                ctx.result(gson.toJson(result));
+            } catch (DataAccessException e) {
+                if (e.getMessage().equals("Error: bad request")) {
+                    ctx.status(400);
+                } else if (e.getMessage().equals("Error: already taken")) {
+                    ctx.status(403);
+                } else {
+                    ctx.status(500);
+                }
+                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
             }
         });
     }

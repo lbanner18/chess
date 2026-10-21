@@ -5,8 +5,8 @@ import dataaccess.UserDAO;
 import dataaccess.DataAccessException;
 import model.RegisterRequest;
 import model.RegisterResult;
-import model.UserData;
 import model.AuthData;
+import model.UserData;
 import java.util.UUID;
 
 public class UserService {
@@ -20,6 +20,9 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException {
 
+        if (request == null || request.username() == null || request.password() == null || request.email() == null) {
+            throw new DataAccessException("Error: bad request");
+        }
         if (request.username() == null || request.password() == null || request.email() == null) {
             throw new DataAccessException("Error: bad request");
         }
