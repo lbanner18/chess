@@ -111,4 +111,39 @@ public class GameServiceTest {
         });
         assertEquals("Error: bad request", exception.getMessage());
     }
+
+    @Test
+    public void joinGameBlackSuccess() throws DataAccessException {
+        CreateGameResult createResult = gameService.createGame(validAuthToken, new CreateGameRequest("Match 2"));
+        gameService.joinGame(validAuthToken, new JoinGameRequest("BLACK", createResult.gameID()));
+
+        GameData updatedGame = gameDAO.getGame(createResult.gameID());
+        assertEquals("Luke", updatedGame.blackUsername());
+    }
+
+    @Test
+    public void joinGameInvalidColorFails() throws DataAccessException {
+        CreateGameResult createResult = gameService.createGame(validAuthToken, new CreateGameRequest("Match 3"));
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
+            gameService.joinGame(validAuthToken, new JoinGameRequest("GREEN", createResult.gameID()));
+        });
+        assertEquals("Error: bad request", exception.getMessage());
+    }
+
+    @Test
+    public void joinGameUnauthorizedFails() throws DataAccessException {
+        CreateGameResult createResult = gameService.createGame(validAuthToken, new CreateGameRequest("Match 4"));
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
+            gameService.joinGame("totally-fake-token", new JoinGameRequest("WHITE", createResult.gameID()));
+        });
+        assertEquals("Error: unauthorized", exception.getMessage());
+    }
+
+    @Test
+    public void createGameBadRequestFails() {
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
+            gameService.createGame(validAuthToken, new CreateGameRequest(null));
+        });
+        assertEquals("Error: bad request", exception.getMessage());
+    }
 }

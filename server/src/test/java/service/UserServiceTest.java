@@ -80,4 +80,14 @@ public class UserServiceTest {
     public void logoutInvalidTokenFails() {
         assertThrows(DataAccessException.class, () -> userService.logout("fake-made-up-token"));
     }
+
+    @Test
+    public void registerBadRequestFails() {
+        RegisterRequest badRequest = new RegisterRequest(null, "password123", "luke@email.com");
+
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
+            userService.register(badRequest);
+        });
+        assertEquals("Error: bad request", exception.getMessage());
+    }
 }
