@@ -17,7 +17,7 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        javalin = Javalin.create();
+        javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         MemoryUserDAO userDAO = new MemoryUserDAO();
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
@@ -26,7 +26,7 @@ public class Server {
         ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
         UserService userService = new UserService(userDAO, authDAO); // <-- NEW
 
-        Gson gson = new Gson(); // <-- NEW
+        Gson gson = new Gson();
 
         javalin.delete("/db", ctx -> {
             try {
@@ -70,6 +70,8 @@ public class Server {
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: unauthorized")) {
                     ctx.status(401);
+                } else if (e.getMessage().equals("Error: bad request")) {
+                    ctx.status(400);
                 } else {
                     ctx.status(500);
                 }
