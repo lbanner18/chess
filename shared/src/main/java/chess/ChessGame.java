@@ -268,27 +268,22 @@ public class ChessGame {
         if (position == null) {
             return false;
         }
-            for (int row = 1; row < 9; row++) {
+        for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
                 ChessPosition enemySquare = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(enemySquare);
 
                 if (piece != null && piece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> enemyMoves = piece.pieceMoves(board, enemySquare);
-                    for (ChessMove move : enemyMoves) {
-                        if (squareAttacked(position, move)) {
-                            return true;
-                        }
+                    continue;
+                }
+
+                Collection<ChessMove> enemyMoves = piece.pieceMoves(board, enemySquare);
+                for (ChessMove move : enemyMoves) {
+                    if (move.getEndPosition().equals(position)) {
+                        return true;
                     }
                 }
             }
-        }
-            return false;
-    }
-
-    private static boolean squareAttacked(ChessPosition position, ChessMove move) {
-        if (move.getEndPosition().equals(position)) {
-            return true;
         }
         return false;
     }
