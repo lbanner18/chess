@@ -273,7 +273,7 @@ public class ChessGame {
                 ChessPosition enemySquare = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(enemySquare);
 
-                if (piece != null && piece.getTeamColor() != teamColor) {
+                if (piece == null || piece.getTeamColor() == teamColor) {
                     continue;
                 }
 
