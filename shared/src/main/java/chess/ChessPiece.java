@@ -66,14 +66,7 @@ public class ChessPiece {
 
     }
 
-    public void getBishopMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
-        int[][] directions = {
-            {1, 1},
-            {1, -1},
-            {-1, 1},
-            {-1, -1}
-        };
-
+    private void calculateSlidingMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves, int[][] directions) {
         for (int[] dir : directions) {
             int row = startPosition.getRow();
             int col = startPosition.getColumn();
@@ -82,21 +75,16 @@ public class ChessPiece {
                 row += dir[0];
                 col += dir[1];
 
-
-                //Check Boundary
                 if (row < 1 || row > 8 || col < 1 || col > 8) {
                     break;
                 }
+
                 ChessPosition targetPosition = new ChessPosition(row, col);
                 ChessPiece pieceAtTarget = board.getPiece(targetPosition);
 
-                //Add open square
                 if (pieceAtTarget == null) {
                     moves.add(new ChessMove(startPosition, targetPosition, null));
-                }
-
-                //Check for enemy piece to add square
-                else {
+                } else {
                     if (pieceAtTarget.getTeamColor() != this.pieceColor) {
                         moves.add(new ChessMove(startPosition, targetPosition, null));
                     }
@@ -104,170 +92,54 @@ public class ChessPiece {
                 }
             }
         }
+    }
+
+    private void calculateStepMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves, int[][] directions) {
+        for (int[] dir : directions) {
+            int row = startPosition.getRow();
+            int col = startPosition.getColumn();
+
+            row += dir[0];
+            col += dir[1];
+
+            if (row > 0 && row < 9 && col > 0 && col < 9) {
+                ChessPosition targetPosition = new ChessPosition(row, col);
+                ChessPiece pieceAtTarget = board.getPiece(targetPosition);
+
+                if (pieceAtTarget == null) {
+                    moves.add(new ChessMove(startPosition, targetPosition, null));
+                } else {
+                    if (pieceAtTarget.getTeamColor() != this.pieceColor) {
+                        moves.add(new ChessMove(startPosition, targetPosition, null));
+                    }
+                }
+            }
+        }
+    }
+
+    public void getBishopMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
+        int[][] directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        calculateSlidingMoves(board, startPosition, moves, directions);
     }
 
     public void getRookMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
-        int[][] directions = {
-            {1, 0},
-            {-1, 0},
-            {0, 1},
-            {0, -1}
-        };
-
-        for (int[] dir : directions) {
-            int row = startPosition.getRow();
-            int col = startPosition.getColumn();
-
-            while (true) {
-                row += dir[0];
-                col += dir[1];
-
-
-                //Check Boundary
-                if (row < 1 || row > 8 || col < 1 || col > 8) {
-                    break;
-                }
-                ChessPosition targetPosition = new ChessPosition(row, col);
-                ChessPiece pieceAtTarget = board.getPiece(targetPosition);
-
-                //Add open square
-                if (pieceAtTarget == null) {
-                    moves.add(new ChessMove(startPosition, targetPosition, null));
-                }
-
-                //Check for enemy piece to add square
-                else {
-                    if (pieceAtTarget.getTeamColor() != this.pieceColor) {
-                        moves.add(new ChessMove(startPosition, targetPosition, null));
-                    }
-                    break;
-                }
-            }
-        }
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        calculateSlidingMoves(board, startPosition, moves, directions);
     }
 
     public void getQueenMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
-        int[][] directions = {
-            {1, 0},
-            {-1, 0},
-            {0, 1},
-            {0, -1},
-            {1, 1},
-            {1, -1},
-            {-1, 1},
-            {-1, -1}
-        };
-
-        for (int[] dir : directions) {
-            int row = startPosition.getRow();
-            int col = startPosition.getColumn();
-
-            while (true) {
-                row += dir[0];
-                col += dir[1];
-
-
-                //Check Boundary
-                if (row < 1 || row > 8 || col < 1 || col > 8) {
-                    break;
-                }
-                ChessPosition targetPosition = new ChessPosition(row, col);
-                ChessPiece pieceAtTarget = board.getPiece(targetPosition);
-
-                //Add open square
-                if (pieceAtTarget == null) {
-                    moves.add(new ChessMove(startPosition, targetPosition, null));
-                }
-
-                //Check for enemy piece to add square
-                else {
-                    if (pieceAtTarget.getTeamColor() != this.pieceColor) {
-                        moves.add(new ChessMove(startPosition, targetPosition, null));
-                    }
-                    break;
-                }
-            }
-        }
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        calculateSlidingMoves(board, startPosition, moves, directions);
     }
 
     public void getKingMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
-        int[][] directions = {
-            {1, 0},
-            {-1, 0},
-            {0, 1},
-            {0, -1},
-            {1, 1},
-            {1, -1},
-            {-1, 1},
-            {-1, -1}
-        };
-
-        for (int[] dir : directions) {
-            int row = startPosition.getRow();
-            int col = startPosition.getColumn();
-
-
-            row += dir[0];
-            col += dir[1];
-
-
-            //Check Boundary
-            if (row > 0 && row < 9 && col > 0 && col < 9) {
-                ChessPosition targetPosition = new ChessPosition(row, col);
-                ChessPiece pieceAtTarget = board.getPiece(targetPosition);
-
-                //Add open square
-                if (pieceAtTarget == null) {
-                    moves.add(new ChessMove(startPosition, targetPosition, null));
-                }
-
-                //Check for enemy piece to add square
-                else {
-                    if (pieceAtTarget.getTeamColor() != this.pieceColor) {
-                        moves.add(new ChessMove(startPosition, targetPosition, null));
-                    }
-                }
-            }
-        }
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        calculateStepMoves(board, startPosition, moves, directions);
     }
 
     public void getKnightMoves(ChessBoard board, ChessPosition startPosition, List<ChessMove> moves) {
-        int[][] directions = {
-            {2, 1},
-            {2, -1},
-            {-2, 1},
-            {-2, -1},
-            {1, 2},
-            {1, -2},
-            {-1, 2},
-            {-1, -2}
-        };
-
-        for (int[] dir : directions) {
-            int row = startPosition.getRow();
-            int col = startPosition.getColumn();
-
-            row += dir[0];
-            col += dir[1];
-
-            //Check Boundary
-            if (row > 0 && row < 9 && col > 0 && col < 9) {
-                ChessPosition targetPosition = new ChessPosition(row, col);
-                ChessPiece pieceAtTarget = board.getPiece(targetPosition);
-
-                //Add open square
-                if (pieceAtTarget == null) {
-                    moves.add(new ChessMove(startPosition, targetPosition, null));
-                }
-
-                //Check for enemy piece to add square
-                else {
-                    if (pieceAtTarget.getTeamColor() != this.pieceColor) {
-                        moves.add(new ChessMove(startPosition, targetPosition, null));
-                    }
-                }
-            }
-        }
+        int[][] directions = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
+        calculateStepMoves(board, startPosition, moves, directions);
     }
 
     public void pawnPromotionMoves(ChessBoard board, ChessPosition startPosition, ChessPosition targetPosition, List<ChessMove> moves) {

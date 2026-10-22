@@ -32,8 +32,12 @@ public class Server {
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO, authDAO);
 
-        Gson gson = new Gson();
+        setupUserRoutes(userService);
+        setupGameRoutes(gameService);
+        setupClearRoutes(clearService);
+    }
 
+    private void setupClearRoutes(ClearService clearService) {
         javalin.delete("/db", ctx -> {
             try {
                 clearService.clear();
@@ -44,6 +48,10 @@ public class Server {
                 ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
             }
         });
+    }
+
+    private void setupUserRoutes(UserService userService) {
+        Gson gson = new Gson();
 
         //Register Endpoint
         javalin.post("/user", ctx -> {
@@ -103,6 +111,11 @@ public class Server {
                 ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
             }
         });
+    }
+
+
+    private void setupGameRoutes(GameService gameService) {
+        Gson gson = new Gson();
 
         // List Games Endpoint
         javalin.get("/game", ctx -> {
@@ -161,6 +174,7 @@ public class Server {
             }
         });
     }
+
 
 
 

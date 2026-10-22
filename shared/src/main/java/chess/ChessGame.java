@@ -206,13 +206,13 @@ public class ChessGame {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
 
-        if (start.equals(new ChessPosition(1, 5))) whiteKingMoved = true;
-        if (start.equals(new ChessPosition(1, 8)) || end.equals(new ChessPosition(1, 8))) whiteKingsideRookMoved = true;
-        if (start.equals(new ChessPosition(1, 1)) || end.equals(new ChessPosition(1, 1))) whiteQueensideRookMoved = true;
+        if (start.equals(new ChessPosition(1, 5))) { whiteKingMoved = true; }
+        if (start.equals(new ChessPosition(1, 8)) || end.equals(new ChessPosition(1, 8))) { whiteKingsideRookMoved = true; }
+        if (start.equals(new ChessPosition(1, 1)) || end.equals(new ChessPosition(1, 1))) { whiteQueensideRookMoved = true; }
 
-        if (start.equals(new ChessPosition(8, 5))) blackKingMoved = true;
-        if (start.equals(new ChessPosition(8, 8)) || end.equals(new ChessPosition(8, 8))) blackKingsideRookMoved = true;
-        if (start.equals(new ChessPosition(8, 1)) || end.equals(new ChessPosition(8, 1))) blackQueensideRookMoved = true;
+        if (start.equals(new ChessPosition(8, 5))) { blackKingMoved = true; }
+        if (start.equals(new ChessPosition(8, 8)) || end.equals(new ChessPosition(8, 8))) { blackKingsideRookMoved = true; }
+        if (start.equals(new ChessPosition(8, 1)) || end.equals(new ChessPosition(8, 1))) { blackQueensideRookMoved = true; }
 
         //Make en passant move
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getEndPosition().equals(enPassantTarget)) {
@@ -276,7 +276,7 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> enemyMoves = piece.pieceMoves(board, enemySquare);
                     for (ChessMove move : enemyMoves) {
-                        if (move.getEndPosition().equals(position)) {
+                        if (squareAttacked(position, move)) {
                             return true;
                         }
                     }
@@ -284,6 +284,13 @@ public class ChessGame {
             }
         }
             return false;
+    }
+
+    private static boolean squareAttacked(ChessPosition position, ChessMove move) {
+        if (move.getEndPosition().equals(position)) {
+            return true;
+        }
+        return false;
     }
 
     public boolean noValidMoves(TeamColor teamColor) {
