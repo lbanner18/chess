@@ -5,7 +5,12 @@ import model.RegisterRequest;
 import model.RegisterResult;
 import model.LoginRequest;
 import model.LoginResult;
+import model.CreateGameRequest;
+import model.CreateGameResult;
+import model.JoinGameRequest;
+import model.ListGamesResult;
 import service.UserService;
+import service.GameService;
 import dataaccess.DataAccessException;
 import io.javalin.Javalin;
 import dataaccess.MemoryAuthDAO;
@@ -24,7 +29,8 @@ public class Server {
         MemoryGameDAO gameDAO = new MemoryGameDAO();
 
         ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
-        UserService userService = new UserService(userDAO, authDAO); // <-- NEW
+        UserService userService = new UserService(userDAO, authDAO);
+        GameService gameService = new GameService(gameDAO, authDAO);
 
         Gson gson = new Gson();
 
@@ -97,7 +103,66 @@ public class Server {
                 ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
             }
         });
+
+        // List Games Endpoint
+        javalin.get("/game", ctx -> {
+            try {
+                String authToken = ctx.header("authorization");
+                ListGamesResult result = gameService.listGames(authToken);
+
+                ctx.status(200);
+                ctx.result(gson.toJson(result));
+            } catch (DataAccessException e) {
+                ctx.status(401);
+                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+            }
+        });
+
+        // Create Game Endpoint
+        javalin.post("/game", ctx -> {
+            try {
+                String authToken = ctx.header("authorization");
+                CreateGameRequest request = gson.fromJson(ctx.body(), CreateGameRequest.class);
+                CreateGameResult result = gameService.createGame(authToken, request);
+
+                ctx.status(200);
+                ctx.result(gson.toJson(result));
+            } catch (DataAccessException e) {
+                if (e.getMessage().equals("Error: bad request")) {
+                    ctx.status(400);
+                } else {
+                    ctx.status(401);
+                }
+                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+            }
+        });
+
+        // Join Game Endpoint (Notice this is a PUT request, not POST)
+        javalin.put("/game", ctx -> {
+            try {
+                String authToken = ctx.header("authorization");
+                JoinGameRequest request = gson.fromJson(ctx.body(), JoinGameRequest.class);
+
+                gameService.joinGame(authToken, request);
+
+                ctx.status(200);
+                ctx.result("{}");
+            } catch (DataAccessException e) {
+                if (e.getMessage().equals("Error: bad request")) {
+                    ctx.status(400);
+                } else if (e.getMessage().equals("Error: unauthorized")) {
+                    ctx.status(401);
+                } else if (e.getMessage().equals("Error: already taken")) {
+                    ctx.status(403);
+                } else {
+                    ctx.status(500);
+                }
+                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+            }
+        });
     }
+
+
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
