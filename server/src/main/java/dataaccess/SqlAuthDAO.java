@@ -33,7 +33,6 @@ public class SqlAuthDAO implements AuthDAO {
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement)) {
 
-            // Using record syntax here!
             ps.setString(1, auth.authToken());
             ps.setString(2, auth.username());
             ps.executeUpdate();
@@ -45,16 +44,41 @@ public class SqlAuthDAO implements AuthDAO {
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
+        String statement = "SELECT authToken, username FROM authData WHERE authToken = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+            ps.setString(1, authToken);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new AuthData(rs.getString("authToken"), rs.getString("username"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: unable to read auth token: " + e.getMessage());
+        }
         return null;
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-
+        String statement = "DELETE FROM authData WHERE authToken = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+            ps.setString(1, authToken);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: unable to delete auth token: " + e.getMessage());
+        }
     }
 
     @Override
     public void clear() throws DataAccessException {
-
+        String statement = "TRUNCATE TABLE authData";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: unable to clear auth data: " + e.getMessage());
+        }
     }
 }
