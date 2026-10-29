@@ -1,13 +1,11 @@
 package dataaccess;
 
-import model.AuthDataimport;
-
-import javax.xml.crypto.Data;
+import model.AuthData;
 import java.sql.SQLException;
 
-public class SqlAuthDAO {
+public class SqlAuthDAO implements AuthDAO {
 
-    public SQLAuthDAO() throws DataAccessException {
+    public SqlAuthDAO() throws DataAccessException {
         configureDatabase();
     }
 
@@ -15,12 +13,11 @@ public class SqlAuthDAO {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             var createTableSql = """
-                
                     CREATE TABLE IF NOT EXISTS authData (
                     authToken VARCHAR(255) NOT NULL,
                     username VARCHAR(255) NOT NULL,
                     PRIMARY KEY (authToken)
-                                    )
+                    )
                 """;
             try (var preparedStatement = conn.prepareStatement(createTableSql)) {
                 preparedStatement.executeUpdate();
@@ -31,8 +28,19 @@ public class SqlAuthDAO {
     }
 
     @Override
-    public AuthData createAuth(String username) throws DataAccessException {
-        return null;
+    public void createAuth(AuthData auth) throws DataAccessException {
+        String statement = "INSERT INTO authData (authToken, username) VALUES (?, ?)";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+
+            // Using record syntax here!
+            ps.setString(1, auth.authToken());
+            ps.setString(2, auth.username());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: unable to create auth token: " + e.getMessage());
+        }
     }
 
     @Override
