@@ -20,7 +20,7 @@ public class SqlUserDAOTest {
     }
 
     @Test
-    @DisplayName("createUser() - Positive: Successfully insert user data")
+    @DisplayName("createUser() Positive: Successfully insert user data")
     public void createUserPositive() throws DataAccessException {
         UserData newUser = new UserData("testUsername", "securePassword123", "test@email.com");
         userDAO.createUser(newUser);
@@ -33,7 +33,7 @@ public class SqlUserDAOTest {
     }
 
     @Test
-    @DisplayName("createUser() - Negative: Throws exception on null username")
+    @DisplayName("createUser() Negative: Throws exception on null username")
     public void createUserNegative() {
         UserData badUser = new UserData(null, "password", "email@test.com");
 
@@ -43,7 +43,7 @@ public class SqlUserDAOTest {
     }
 
     @Test
-    @DisplayName("getUser() - Positive: Retrieve existing user")
+    @DisplayName("getUser() Positive: Retrieve existing user")
     public void getUserPositive() throws DataAccessException {
         UserData user = new UserData("existingUser", "pass456", "existing@email.com");
         userDAO.createUser(user);
@@ -54,14 +54,14 @@ public class SqlUserDAOTest {
     }
 
     @Test
-    @DisplayName("getUser() - Negative: Return null for missing user")
+    @DisplayName("getUser() Negative: Return null for missing user")
     public void getUserNegative() throws DataAccessException {
         UserData found = userDAO.getUser("fakeUser999");
         assertNull(found, "Searching for a non-existent user should return null");
     }
 
     @Test
-    @DisplayName("clear() - Positive: Remove all users")
+    @DisplayName("clear() Positive: Remove all users")
     public void clearPositive() throws DataAccessException {
         userDAO.createUser(new UserData("user1", "pass1", "email1@test.com"));
         userDAO.createUser(new UserData("user2", "pass2", "email2@test.com"));

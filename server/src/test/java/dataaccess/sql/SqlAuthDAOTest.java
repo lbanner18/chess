@@ -20,7 +20,7 @@ public class SqlAuthDAOTest {
     }
 
     @Test
-    @DisplayName("createAuth() - Positive: Successfully insert auth data")
+    @DisplayName("createAuth() Positive: Successfully insert auth data")
     public void createAuthPositive() throws DataAccessException {
         AuthData newAuth = new AuthData("test-token-123", "testUser");
         authDAO.createAuth(newAuth);
@@ -31,7 +31,7 @@ public class SqlAuthDAOTest {
     }
 
     @Test
-    @DisplayName("createAuth() - Negative: Throws exception on null token")
+    @DisplayName("createAuth() Negative: Throws exception on null token")
     public void createAuthNegative() {
         AuthData badAuth = new AuthData(null, "testUser");
 
@@ -41,7 +41,7 @@ public class SqlAuthDAOTest {
     }
 
     @Test
-    @DisplayName("getAuth() - Positive: Retrieve existing auth")
+    @DisplayName("getAuth() Positive: Retrieve existing auth")
     public void getAuthPositive() throws DataAccessException {
         AuthData auth = new AuthData("token-456", "existingUser");
         authDAO.createAuth(auth);
@@ -52,14 +52,14 @@ public class SqlAuthDAOTest {
     }
 
     @Test
-    @DisplayName("getAuth() - Negative: Return null for missing token")
+    @DisplayName("getAuth() Negative: Return null for missing token")
     public void getAuthNegative() throws DataAccessException {
         AuthData found = authDAO.getAuth("fake-token-999");
         assertNull(found, "Searching for a non-existent token should return null");
     }
 
     @Test
-    @DisplayName("deleteAuth() - Positive: Remove an existing token")
+    @DisplayName("deleteAuth() Positive: Remove an existing token")
     public void deleteAuthPositive() throws DataAccessException {
         AuthData auth = new AuthData("token-to-delete", "doomedUser");
         authDAO.createAuth(auth);
@@ -70,7 +70,7 @@ public class SqlAuthDAOTest {
     }
 
     @Test
-    @DisplayName("clear() - Positive: Remove all tokens")
+    @DisplayName("clear() Positive: Remove all tokens")
     public void clearPositive() throws DataAccessException {
         authDAO.createAuth(new AuthData("token-1", "user1"));
         authDAO.createAuth(new AuthData("token-2", "user2"));
