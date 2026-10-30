@@ -103,4 +103,17 @@ public class SqlAuthDAOTest {
             authDAO.getAuth("testToken");
         });
     }
+
+    @Test
+    @DisplayName("deleteAuth() Negative: Throws exception on database error")
+    public void deleteAuthException() throws Exception {
+        try (var conn = dataaccess.DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("DROP TABLE authData")) {
+            ps.executeUpdate();
+        }
+
+        assertThrows(DataAccessException.class, () -> {
+            authDAO.deleteAuth("someToken");
+        });
+    }
 }

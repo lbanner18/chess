@@ -119,4 +119,17 @@ public class SqlGameDAOTest {
             gameDAO.listGames();
         });
     }
+
+    @Test
+    @DisplayName("clear() Negative: Throws exception on database error")
+    public void clearException() throws Exception {
+        try (var conn = dataaccess.DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("DROP TABLE gameData")) {
+            ps.executeUpdate();
+        }
+
+        assertThrows(DataAccessException.class, () -> {
+            gameDAO.clear();
+        });
+    }
 }
