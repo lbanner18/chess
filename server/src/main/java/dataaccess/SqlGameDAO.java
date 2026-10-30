@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.sql.Statement;
 
 public class SqlGameDAO implements GameDAO {
