@@ -90,4 +90,17 @@ public class SqlAuthDAOTest {
             authDAO.createAuth(auth);
         }, "Inserting a duplicate auth token should throw a DataAccessException");
     }
+
+    @Test
+    @DisplayName("getAuth() Negative: Throws exception on database error")
+    public void getAuthException() throws Exception {
+        try (var conn = dataaccess.DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("DROP TABLE authData")) {
+            ps.executeUpdate();
+        }
+
+        assertThrows(DataAccessException.class, () -> {
+            authDAO.getAuth("testToken");
+        });
+    }
 }

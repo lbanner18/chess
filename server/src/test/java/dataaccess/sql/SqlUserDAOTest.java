@@ -82,4 +82,17 @@ public class SqlUserDAOTest {
             userDAO.createUser(user);
         }, "Inserting a duplicate username should throw a DataAccessException");
     }
+
+    @Test
+    @DisplayName("getUser() Negative: Throws exception on database error")
+    public void getUserException() throws Exception {
+        try (var conn = dataaccess.DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("DROP TABLE userData")) {
+            ps.executeUpdate();
+        }
+
+        assertThrows(DataAccessException.class, () -> {
+            userDAO.getUser("testUser");
+        }, "Querying a dropped table should throw a DataAccessException");
+    }
 }

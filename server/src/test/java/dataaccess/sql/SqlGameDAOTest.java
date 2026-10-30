@@ -106,4 +106,17 @@ public class SqlGameDAOTest {
         var games = gameDAO.listGames();
         assertTrue(games.isEmpty(), "List of games should be empty when no games have been created");
     }
+
+    @Test
+    @DisplayName("listGames() Negative: Throws exception on database error")
+    public void listGamesException() throws Exception {
+        try (var conn = dataaccess.DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("DROP TABLE gameData")) {
+            ps.executeUpdate();
+        }
+
+        assertThrows(DataAccessException.class, () -> {
+            gameDAO.listGames();
+        });
+    }
 }
