@@ -79,4 +79,15 @@ public class SqlAuthDAOTest {
         assertNull(authDAO.getAuth("token-1"));
         assertNull(authDAO.getAuth("token-2"));
     }
+
+    @Test
+    @DisplayName("createAuth() Negative: Throws exception on duplicate auth token")
+    public void createAuthDuplicate() throws DataAccessException {
+        AuthData auth = new AuthData("duplicate-token-123", "testUser");
+        authDAO.createAuth(auth);
+
+        assertThrows(DataAccessException.class, () -> {
+            authDAO.createAuth(auth);
+        }, "Inserting a duplicate auth token should throw a DataAccessException");
+    }
 }

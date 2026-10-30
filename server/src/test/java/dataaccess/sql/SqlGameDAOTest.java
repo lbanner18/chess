@@ -97,4 +97,13 @@ public class SqlGameDAOTest {
 
         assertTrue(games.isEmpty(), "List of games should be empty after clear() is called");
     }
+
+    @Test
+    @DisplayName("listGames() Positive: Returns empty collection when no games exist")
+    public void listGamesEmpty() throws DataAccessException {
+        gameDAO.clear();
+
+        var games = gameDAO.listGames();
+        assertTrue(games.isEmpty(), "List of games should be empty when no games have been created");
+    }
 }
