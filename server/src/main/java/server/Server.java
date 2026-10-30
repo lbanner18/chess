@@ -57,7 +57,7 @@ public class Server {
                 ctx.result("{}");
             } catch (Exception e) {
                 ctx.status(500);
-                ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
+                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
             }
         });
     }
@@ -81,7 +81,7 @@ public class Server {
                 } else {
                     ctx.status(500);
                 }
-                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
             }
         });
 
@@ -101,7 +101,7 @@ public class Server {
                 } else {
                     ctx.status(500);
                 }
-                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
             }
         });
 
@@ -120,7 +120,7 @@ public class Server {
                 } else {
                     ctx.status(500);
                 }
-                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
             }
         });
     }
@@ -138,8 +138,12 @@ public class Server {
                 ctx.status(200);
                 ctx.result(gson.toJson(result));
             } catch (DataAccessException e) {
-                ctx.status(401);
-                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+                if (e.getMessage().equals("Error: unauthorized")) {
+                    ctx.status(401);
+                } else {
+                    ctx.status(500);
+                }
+                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
             }
         });
 
@@ -155,14 +159,16 @@ public class Server {
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: bad request")) {
                     ctx.status(400);
-                } else {
+                } else if (e.getMessage().equals("Error: unauthorized")) {
                     ctx.status(401);
+                } else {
+                    ctx.status(500);
                 }
-                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
             }
         });
 
-        // Join Game Endpoint (Notice this is a PUT request, not POST)
+        // Join Game Endpoint
         javalin.put("/game", ctx -> {
             try {
                 String authToken = ctx.header("authorization");
@@ -182,7 +188,7 @@ public class Server {
                 } else {
                     ctx.status(500);
                 }
-                ctx.result("{ \"message\": \"" + e.getMessage() + "\" }");
+                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
             }
         });
     }
