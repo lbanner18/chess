@@ -6,6 +6,7 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +29,7 @@ public class SqlUserDAOTest {
         UserData retrievedUser = userDAO.getUser("testUsername");
         assertNotNull(retrievedUser, "UserData should be found in the database");
         assertEquals("testUsername", retrievedUser.username(), "Usernames should match");
-        assertEquals("securePassword123", retrievedUser.password(), "Passwords should match");
+        assertTrue(BCrypt.checkpw("securePassword123", retrievedUser.password()), "Password hash should match the original password");
         assertEquals("test@email.com", retrievedUser.email(), "Emails should match");
     }
 

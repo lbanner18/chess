@@ -13,6 +13,7 @@ import service.UserService;
 import service.GameService;
 import dataaccess.DataAccessException;
 import io.javalin.Javalin;
+import io.javalin.http.Context;
 import dataaccess.SqlAuthDAO;
 import dataaccess.SqlGameDAO;
 import dataaccess.SqlUserDAO;
@@ -49,6 +50,26 @@ public class Server {
         setupClearRoutes(clearService);
     }
 
+    private void errorHandler(Exception e, Context ctx) {
+        String message = e.getMessage();
+
+        if ("Error: bad request".equals(message)) {
+            ctx.status(400);
+        } else if ("Error: unauthorized".equals(message)) {
+            ctx.status(401);
+        } else if ("Error: already taken".equals(message)) {
+            ctx.status(403);
+        } else {
+            ctx.status(500);
+        }
+
+        if (message == null) {
+            message = "Unknown error";
+        }
+
+        ctx.result("{ \"message\": \"Error: " + message.replace("Error: ", "") + "\" }");
+    }
+
     private void setupClearRoutes(ClearService clearService) {
         javalin.delete("/db", ctx -> {
             try {
@@ -56,8 +77,7 @@ public class Server {
                 ctx.status(200);
                 ctx.result("{}");
             } catch (Exception e) {
-                ctx.status(500);
-                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
+                errorHandler(e, ctx);
             }
         });
     }
@@ -74,14 +94,7 @@ public class Server {
                 ctx.status(200);
                 ctx.result(gson.toJson(result));
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: bad request")) {
-                    ctx.status(400);
-                } else if (e.getMessage().equals("Error: already taken")) {
-                    ctx.status(403);
-                } else {
-                    ctx.status(500);
-                }
-                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
+                errorHandler(e, ctx);
             }
         });
 
@@ -94,14 +107,7 @@ public class Server {
                 ctx.status(200);
                 ctx.result(gson.toJson(result));
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: unauthorized")) {
-                    ctx.status(401);
-                } else if (e.getMessage().equals("Error: bad request")) {
-                    ctx.status(400);
-                } else {
-                    ctx.status(500);
-                }
-                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
+                errorHandler(e, ctx);
             }
         });
 
@@ -115,12 +121,7 @@ public class Server {
                 ctx.status(200);
                 ctx.result("{}");
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: unauthorized")) {
-                    ctx.status(401);
-                } else {
-                    ctx.status(500);
-                }
-                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
+                errorHandler(e, ctx);
             }
         });
     }
@@ -138,12 +139,7 @@ public class Server {
                 ctx.status(200);
                 ctx.result(gson.toJson(result));
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: unauthorized")) {
-                    ctx.status(401);
-                } else {
-                    ctx.status(500);
-                }
-                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
+                errorHandler(e, ctx);
             }
         });
 
@@ -157,14 +153,7 @@ public class Server {
                 ctx.status(200);
                 ctx.result(gson.toJson(result));
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: bad request")) {
-                    ctx.status(400);
-                } else if (e.getMessage().equals("Error: unauthorized")) {
-                    ctx.status(401);
-                } else {
-                    ctx.status(500);
-                }
-                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
+                errorHandler(e, ctx);
             }
         });
 
@@ -179,22 +168,10 @@ public class Server {
                 ctx.status(200);
                 ctx.result("{}");
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: bad request")) {
-                    ctx.status(400);
-                } else if (e.getMessage().equals("Error: unauthorized")) {
-                    ctx.status(401);
-                } else if (e.getMessage().equals("Error: already taken")) {
-                    ctx.status(403);
-                } else {
-                    ctx.status(500);
-                }
-                ctx.result("{ \"message\": \"Error: " + e.getMessage().replace("Error: ", "") + "\" }");
+                errorHandler(e, ctx);
             }
         });
     }
-
-
-
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
