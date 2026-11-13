@@ -18,6 +18,7 @@ public class ServerFacade {
         this.serverUrl = "http://localhost:" + port;
     }
 
+    //the different possible endpoints mapped to their HTTP requests
     public RegisterResult register(RegisterRequest request) throws ResponseException {
         return makeRequest("POST", "/user", request, RegisterResult.class, null);
     }
@@ -46,19 +47,23 @@ public class ServerFacade {
         makeRequest("DELETE", "/db", null, null, null);
     }
 
+    //Generic helper method using <T> from 235 to simplify ServerFacade
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
+            //Creates the URL Request and sets method
             URL chessURL = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) chessURL.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
+            //Setting the headers
             if (authToken != null) {
                 http.addRequestProperty("authorization", authToken);
             }
 
             if (request != null) {
                 http.addRequestProperty("Content-Type", "application/json");
+                //Serialize Java request into JSON string and send
                 try (OutputStream reqBody = http.getOutputStream()) {
                     String jsonRequest = gson.toJson(request);
                     reqBody.write(jsonRequest.getBytes());
@@ -67,10 +72,12 @@ public class ServerFacade {
 
             http.connect();
 
+            //Check for errors
             if (http.getResponseCode() >= 400) {
                 throw new ResponseException(http.getResponseCode(), extractErrorMessage(http.getErrorStream()));
             }
 
+            //Read and Deserialize return JSON string
             if (responseClass != null) {
                 try (InputStream respBody = http.getInputStream()) {
                     InputStreamReader reader = new InputStreamReader(respBody);
@@ -87,6 +94,7 @@ public class ServerFacade {
         }
     }
 
+    //Extract the error message for easier error handling
     private String extractErrorMessage(InputStream errorStream) {
         try {
             if (errorStream == null) return "Unknown error";

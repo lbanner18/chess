@@ -31,7 +31,7 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-
+    // --- CLEAR TESTS ---
     @BeforeEach
     public void clearDatabase() {
         try {
@@ -41,40 +41,46 @@ public class ServerFacadeTests {
         }
     }
 
+    // --- REGISTER TESTS ---
+
+    //Positive
     @Test
     public void registerPositive() {
         var request = new RegisterRequest("player1", "password", "p1@email.com");
 
         assertDoesNotThrow(() -> {
             var result = facade.register(request);
-            assertNotNull(result.authToken(), "AuthToken should not be null after successful registration");
+            assertNotNull(result.authToken(), "AuthToken should not be null after a successful registration");
             assertEquals("player1", result.username());
         });
     }
 
     @Test
+    //Negative
     public void registerNegativeDuplicateUser() {
         var request = new RegisterRequest("player1", "password", "p1@email.com");
 
         assertDoesNotThrow(() -> facade.register(request));
 
         assertThrows(Exception.class, () -> facade.register(request),
-                "Registering a duplicate user should throw an exception");
+                "Attempting to register a duplicate user should throw an exception");
     }
 
     // --- LOGIN TESTS ---
 
     @Test
+    //Positive
     public void loginPositive() throws Exception {
         facade.register(new RegisterRequest("player2", "pass", "p2@email.com"));
 
         var loginReq = new LoginRequest("player2", "pass");
         assertDoesNotThrow(() -> {
             var result = facade.login(loginReq);
-            assertNotNull(result.authToken(), "AuthToken should be returned on successful login");
+            assertNotNull(result.authToken(), "AuthToken should be returned on a successful login");
         });
     }
 
+    //Negative
     @Test
     public void loginNegativeWrongPassword() throws Exception {
         facade.register(new RegisterRequest("player3", "pass", "p3@email.com"));
@@ -87,6 +93,7 @@ public class ServerFacadeTests {
 
     // --- CREATE GAME TESTS ---
 
+    //Positive
     @Test
     public void createGamePositive() throws Exception {
         var auth = facade.register(new RegisterRequest("player4", "pass", "p4@email.com"));
@@ -98,6 +105,7 @@ public class ServerFacadeTests {
         });
     }
 
+    //Negative
     @Test
     public void createGameNegativeBadToken() {
         var gameReq = new CreateGameRequest("Test Game");
@@ -108,6 +116,7 @@ public class ServerFacadeTests {
 
     // --- LIST GAMES TESTS ---
 
+    //Positive
     @Test
     public void listGamesPositive() throws Exception {
         var auth = facade.register(new RegisterRequest("player6", "pass", "p6@email.com"));
@@ -120,6 +129,7 @@ public class ServerFacadeTests {
         });
     }
 
+    //Negative
     @Test
     public void listGamesNegativeBadToken() {
         assertThrows(Exception.class, () -> facade.listGames("gibberish"),
@@ -128,6 +138,7 @@ public class ServerFacadeTests {
 
     // --- JOIN GAME TESTS ---
 
+    //Positive
     @Test
     public void joinGamePositive() throws Exception {
         var auth = facade.register(new RegisterRequest("player7", "pass", "p7@email.com"));
@@ -139,6 +150,7 @@ public class ServerFacadeTests {
                 "Joining a valid game with an available color should succeed");
     }
 
+    //Negative
     @Test
     public void joinGameNegativeAlreadyTaken() throws Exception {
         var auth1 = facade.register(new RegisterRequest("player8", "pass", "p8@email.com"));
@@ -155,6 +167,7 @@ public class ServerFacadeTests {
 
     // --- LOGOUT TESTS ---
 
+    //Positive
     @Test
     public void logoutPositive() throws Exception {
         var auth = facade.register(new RegisterRequest("player5", "pass", "p5@email.com"));
@@ -163,6 +176,7 @@ public class ServerFacadeTests {
                 "Logging out with a valid token should not throw an exception");
     }
 
+    //Negative
     @Test
     public void logoutNegativeBadToken() {
         assertThrows(Exception.class, () -> facade.logout("idk man"),
