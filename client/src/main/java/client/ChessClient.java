@@ -6,6 +6,8 @@ import model.LoginRequest;
 import model.CreateGameRequest;
 import model.JoinGameRequest;
 import model.GameData;
+import chess.ChessBoard;
+import ui.BoardPrinter;
 
 public class ChessClient {
     private final ServerFacade server;
@@ -102,6 +104,10 @@ public class ChessClient {
         if (params.length == 1) {
             var request = new CreateGameRequest(params[0]);
             server.createGame(request, authToken);
+
+            var listResult = server.listGames(authToken);
+            savedGames = listResult.games().toArray(new GameData[0]);
+
             return String.format("Game '%s' created successfully!", params[0]);
         }
         return "Expected Syntax: create <NAME>";
@@ -139,6 +145,11 @@ public class ChessClient {
                 var request = new JoinGameRequest(color, gameID);
                 server.joinGame(request, authToken);
 
+                ChessBoard board = new ChessBoard();
+                board.resetBoard();
+
+                BoardPrinter.printBoard(board, color.equals("WHITE"));
+
                 return String.format("Successfully joined game %d as %s.", (index + 1), color);
             } catch (NumberFormatException ex) {
                 return "Expected a number for the game ID.";
@@ -159,6 +170,11 @@ public class ChessClient {
 
                 var request = new JoinGameRequest(null, gameID);
                 server.joinGame(request, authToken);
+
+                ChessBoard board = new ChessBoard();
+                board.resetBoard();
+
+                BoardPrinter.printBoard(board, true);
 
                 return String.format("Now observing game %d. ", (index + 1));
             } catch (NumberFormatException e) {
