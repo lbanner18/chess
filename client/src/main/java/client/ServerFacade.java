@@ -97,7 +97,7 @@ public class ServerFacade {
     //Extract the error message for easier error handling
     private String extractErrorMessage(InputStream errorStream) {
         try {
-            if (errorStream == null) return "Unknown error";
+            if (errorStream == null) { return "Unknown error"; }
             InputStreamReader reader = new InputStreamReader(errorStream);
             java.util.Map<String, String> errorMap = gson.fromJson(reader, java.util.Map.class);
             return errorMap.getOrDefault("message", "Unknown error");

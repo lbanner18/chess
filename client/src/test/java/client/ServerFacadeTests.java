@@ -6,9 +6,6 @@ import model.RegisterRequest;
 import model.LoginRequest;
 import model.CreateGameRequest;
 import model.JoinGameRequest;
-import model.ListGamesResult;
-import model.GameData;
-import server.Server;
 
 import static org.junit.jupiter.api.Assertions.*;
 

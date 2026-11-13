@@ -14,6 +14,7 @@ public class ChessClient {
     private String authToken = null;
     private GameData[] savedGames = new GameData[0];
 
+    //The facade connects the server to the brain. The facade starts up here
     public ChessClient(int serverPort) {
         server = new ServerFacade(serverPort);
     }
@@ -22,6 +23,7 @@ public class ChessClient {
         return authToken != null;
     }
 
+    //Gets the string and separates it into its distinct parts. # of parameters are stored for future command checks
     public String eval(String input) {
         try {
             var tokens = input.toLowerCase().split(" ");
@@ -38,6 +40,7 @@ public class ChessClient {
         }
     }
 
+    //In Pre-Login state, reads the first command and uses case-switch to determine next step. Defaults back to help
     private String evalPreLogin(String cmd, String[] params) throws ResponseException {
         return switch (cmd) {
             case "register" -> register(params);
@@ -47,6 +50,7 @@ public class ChessClient {
         };
     }
 
+    //Same as above but for Post-Login state
     private String evalPostLogin(String cmd, String[] params) throws ResponseException {
         return switch (cmd) {
             case "create" -> createGame(params);
@@ -60,12 +64,14 @@ public class ChessClient {
 
     //Pre-Login
 
+    //Register command combines inputs into server's register method's expected argument and runs server.register()
     private String register(String[] params) throws ResponseException {
         if (params.length == 3) {
             var request = new RegisterRequest(params[0], params[1], params[2]);
             var result = server.register(request);
             authToken = result.authToken();
 
+            //Refreshes saved games so newly registered players can immediately access saved games w/o running list
             var listResult = server.listGames(authToken);
             savedGames = listResult.games().toArray(new GameData[0]);
 
@@ -74,12 +80,14 @@ public class ChessClient {
         return "Expected syntax: register <username> <password> <email>";
     }
 
+    //Login command combines inputs into server's login method's expected argument and runs server.login()
     private String login(String[] params) throws ResponseException {
         if (params.length == 2) {
             var request = new LoginRequest(params[0], params[1]);
             var result = server.login(request);
             authToken = result.authToken();
 
+            //Refreshes saved games so newly logged in players can immediately access saved games w/o running list
             var listResult = server.listGames(authToken);
             savedGames = listResult.games().toArray(new GameData[0]);
 
@@ -88,6 +96,7 @@ public class ChessClient {
         return "Expected syntax: login <username> <password>";
     }
 
+    //Outputs the help menu. Meant to be simple enough for a grandma
     private String helpPreLogin() {
         return """
                 Available Commands:
@@ -100,6 +109,7 @@ public class ChessClient {
 
     //Post-Login
 
+    //Same as Pre-login, take createGame command and format arguments to fit server.createGame()
     private String createGame(String[] params) throws ResponseException {
         if (params.length == 1) {
             var request = new CreateGameRequest(params[0]);
@@ -113,6 +123,7 @@ public class ChessClient {
         return "Expected Syntax: create <NAME>";
     }
 
+    //Lists games in database
     private String listGames() throws ResponseException {
         var result = server.listGames(authToken);
 
@@ -120,6 +131,7 @@ public class ChessClient {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Available Games:\n");
+        //Lists which players are available
         for (int i = 0; i < savedGames.length; i++) {
             GameData game = savedGames[i];
             String white = game.whiteUsername() != null ? game.whiteUsername() : "Empty";
@@ -131,6 +143,7 @@ public class ChessClient {
         return sb.toString();
     }
 
+    //Connects a user to a game and outputs board. Takes color argument for JoinGameRequest() arguments
     private String joinGame(String[] params) throws ResponseException {
         if (params.length == 2) {
             try {
@@ -145,6 +158,7 @@ public class ChessClient {
                 var request = new JoinGameRequest(color, gameID);
                 server.joinGame(request, authToken);
 
+                //Creates new chessboard in database, resets, and prints
                 ChessBoard board = new ChessBoard();
                 board.resetBoard();
 
@@ -158,6 +172,7 @@ public class ChessClient {
         return "Expected syntax: join <ID> [WHITE]/[BLACK]";
     }
 
+    //Same idea as joinGame. User joins without a color so they can observe but not modify the board.
     private String observeGame(String[] params) throws ResponseException {
         if (params.length == 1) {
             try {
@@ -184,6 +199,7 @@ public class ChessClient {
         return "Expected: observe <ID>";
     }
 
+    //Logs out user
     private String logout() throws ResponseException {
         server.logout(authToken);
         authToken = null;
@@ -191,6 +207,7 @@ public class ChessClient {
         return "Logged out successfully.";
     }
 
+    //Outputs the help menu for looged-in user. Grandma should understand, grandpa might have a harder time
     private String helpPostLogin() {
         return """
                Available Commands:

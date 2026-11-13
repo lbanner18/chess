@@ -45,13 +45,13 @@ public class GameService {
             throw new DataAccessException("Error: bad request");
         }
 
-        if (request.playerColor() == null || request.playerColor().isEmpty()) {
-            return;
-        }
-
         GameData game = gameDAO.getGame(request.gameID());
         if (game == null) {
             throw new DataAccessException("Error: bad request");
+        }
+
+        if (request.playerColor() == null) {
+            return;
         }
 
         String username = auth.username();
