@@ -11,7 +11,7 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println(SET_TEXT_COLOR_WHITE + "♕ Welcome to CL Chess! Type \"Help\" to get started. ♕");
+        System.out.println(SET_TEXT_COLOR_WHITE + "♕ Welcome to CL Chess! Type 'help' to get started. ♕");
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
