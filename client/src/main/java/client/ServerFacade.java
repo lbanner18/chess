@@ -18,6 +18,30 @@ public class ServerFacade {
         this.serverUrl = "http://localhost:" + port;
     }
 
+    public RegisterResult register(RegisterRequest request) throws ResponseException {
+        return makeRequest("POST", "/user", request, RegisterResult.class, null);
+    }
+
+    public LoginResult login(LoginRequest request) throws ResponseException {
+        return makeRequest("POST", "/session", request, LoginResult.class, null);
+    }
+
+    public void logout(String authToken) throws ResponseException {
+        makeRequest("DELETE", "/session", null, null, authToken);
+    }
+
+    public CreateGameResult createGame(CreateGameRequest request, String authToken) throws ResponseException {
+        return makeRequest("POST", "/game", request, CreateGameResult.class, authToken);
+    }
+
+    public ListGamesResult listGames(String authToken) throws ResponseException {
+        return makeRequest("GET", "/game", null, ListGamesResult.class, authToken);
+    }
+
+    public void joinGame(JoinGameRequest request, String authToken) throws ResponseException {
+        makeRequest("PUT", "/game", request, null, authToken);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
             URL chessURL = (new URI(serverUrl + path)).toURL();
