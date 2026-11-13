@@ -7,7 +7,7 @@ public class Repl {
     private final ChessClient client;
 
     public Repl(int serverPort) {
-        client = new ChessClient;
+        client = new ChessClient(serverPort);
     }
 
     public void run() {
