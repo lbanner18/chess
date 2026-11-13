@@ -26,5 +26,4 @@ public class ServerFacadeTests {
         Assertions.assertTrue(true);
     }
 
-    //insert more tests here
 }
