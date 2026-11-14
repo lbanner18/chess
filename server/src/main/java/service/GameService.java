@@ -36,7 +36,6 @@ public class GameService {
     }
 
     public void joinGame(String authToken, JoinGameRequest request) throws DataAccessException {
-        System.out.println("DEBUG - Join Request Received -> Color: [" + request.playerColor() + "], GameID: [" + request.gameID() + "]");
         AuthData auth = authDAO.getAuth(authToken);
         if (auth == null) {
             throw new DataAccessException("Error: unauthorized");
@@ -56,8 +55,7 @@ public class GameService {
         }
 
         String username = auth.username();
-        String color = request.playerColor().toUpperCase();
-
+        String color = request.playerColor();
         if (color.equals("WHITE")) {
             if (game.whiteUsername() != null) {
                 throw new DataAccessException("Error: already taken");
