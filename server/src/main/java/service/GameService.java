@@ -36,6 +36,7 @@ public class GameService {
     }
 
     public void joinGame(String authToken, JoinGameRequest request) throws DataAccessException {
+        System.out.println("DEBUG - Join Request Received -> Color: [" + request.playerColor() + "], GameID: [" + request.gameID() + "]");
         AuthData auth = authDAO.getAuth(authToken);
         if (auth == null) {
             throw new DataAccessException("Error: unauthorized");
