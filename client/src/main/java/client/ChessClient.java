@@ -172,7 +172,7 @@ public class ChessClient {
         return "Expected syntax: join <ID> [WHITE]/[BLACK]";
     }
 
-    //Same idea as joinGame. User joins without a color so they can observe but not modify the board.
+    //Games are listed and the board of a saved game is output so the user can observe but not modify the board.
     private String observeGame(String[] params) throws ResponseException {
         if (params.length == 1) {
             try {
@@ -181,13 +181,9 @@ public class ChessClient {
                     return "Invalid game ID. Run 'list' to see available games.";
                 }
 
-                int gameID = savedGames[index].gameID();
+                GameData game = savedGames[index];
 
-                var request = new JoinGameRequest(null, gameID);
-                server.joinGame(request, authToken);
-
-                ChessBoard board = new ChessBoard();
-                board.resetBoard();
+                ChessBoard board = game.game().getBoard();
 
                 BoardPrinter.printBoard(board, true);
 
