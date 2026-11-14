@@ -183,18 +183,6 @@ public class ServerFacadeTests {
                 "Joining a non-existent game ID should throw an exception");
     }
 
-    @Test
-    public void joinGameNegativeInvalidGameID() throws Exception {
-        var auth = facade.register(new RegisterRequest("player11", "pass", "p11@email.com"));
-
-        var joinReq = new JoinGameRequest("BLACK", 9999999);
-
-        assertThrows(Exception.class, () -> facade.joinGame(joinReq, auth.authToken()),
-                "Joining a non-existent game ID should throw an exception");
-
-
-    }
-
     // --- LOGOUT TESTS ---
 
     //Positive
