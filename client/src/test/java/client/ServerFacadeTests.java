@@ -28,7 +28,6 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-    // --- CLEAR TESTS ---
     @BeforeEach
     public void clearDatabase() {
         try {
@@ -102,13 +101,24 @@ public class ServerFacadeTests {
         });
     }
 
-    //Negative
+    //Negative (Bad Token)
     @Test
     public void createGameNegativeBadToken() {
         var gameReq = new CreateGameRequest("Test Game");
 
         assertThrows(Exception.class, () -> facade.createGame(gameReq, "fake invalid token"),
                 "Creating a game with a bad token should throw an exception");
+    }
+
+    //Negative (Empty Name)
+    @Test
+    public void createGameNegativeNullName() throws Exception {
+        var auth = facade.register(new RegisterRequest("player12", "pass", "p12@email.com"));
+
+        var gameReq = new CreateGameRequest(null);
+
+        assertThrows(Exception.class, () -> facade.createGame(gameReq, auth.authToken()),
+                "Creating a game without a name should throw an exception");
     }
 
     // --- LIST GAMES TESTS ---
@@ -147,7 +157,7 @@ public class ServerFacadeTests {
                 "Joining a valid game with an available color should succeed");
     }
 
-    //Negative
+    //Negative (Taken color)
     @Test
     public void joinGameNegativeAlreadyTaken() throws Exception {
         var auth1 = facade.register(new RegisterRequest("player8", "pass", "p8@email.com"));
@@ -160,6 +170,19 @@ public class ServerFacadeTests {
 
         assertThrows(Exception.class, () -> facade.joinGame(joinReq, auth2.authToken()),
                 "Joining a game with a color that is already taken should throw an exception");
+    }
+
+    //Negative (Invalid ID)
+    @Test
+    public void joinGameNegativeInvalidGameID() throws Exception {
+        var auth = facade.register(new RegisterRequest("player11", "pass", "p11@email.com"));
+
+        var joinReq = new JoinGameRequest("BLACK", 9999999);
+
+        assertThrows(Exception.class, () -> facade.joinGame(joinReq, auth.authToken()),
+                "Joining a non-existent game ID should throw an exception");
+
+
     }
 
     // --- LOGOUT TESTS ---
@@ -178,5 +201,20 @@ public class ServerFacadeTests {
     public void logoutNegativeBadToken() {
         assertThrows(Exception.class, () -> facade.logout("idk man"),
                 "Logging out with an invalid token should throw an exception");
+    }
+
+    // --- CLEAR TESTS ---
+
+    //Positive
+    @Test
+    public void clearPositive() throws Exception {
+        facade.register(new RegisterRequest("player10", "pass", "p10@email.com"));
+
+        assertDoesNotThrow(() -> facade.clear(),
+                "Clear should not throw an exception");
+
+        var loginReq = new LoginRequest("clearUser", "pass");
+        assertThrows(Exception.class, () -> facade.login(loginReq),
+                "Logging in after a clear should throw an exception because the user was cleared");
     }
 }
